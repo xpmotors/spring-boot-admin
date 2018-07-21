@@ -15,15 +15,14 @@
  */
 package spring.boot.admin.turbine.web;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-
+import de.codecentric.boot.admin.web.AdminController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import de.codecentric.boot.admin.web.AdminController;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides informations for the turbine view. Only available clusters until now.
@@ -34,15 +33,25 @@ import de.codecentric.boot.admin.web.AdminController;
 @ResponseBody
 @RequestMapping("/api/turbine")
 public class TurbineController {
+
 	private final String[] clusters;
+	private boolean useStaticStreamUrl;
 
 	public TurbineController(String[] clusters) {
+		this(clusters, false);
+	}
+
+	public TurbineController(String[] clusters, boolean useStaticStreamUrl) {
 		this.clusters = Arrays.copyOf(clusters, clusters.length);
+		this.useStaticStreamUrl = useStaticStreamUrl;
 	}
 
 	@RequestMapping(value = "/clusters", method = RequestMethod.GET)
 	public Map<String, ?> getClusters() {
-		return Collections.singletonMap("clusters", clusters);
+		Map<String, Object> map = new HashMap();
+		map.put("clusters", clusters);
+		map.put("useStaticStreamUrl", useStaticStreamUrl);
+		return map;
 	}
 
 }

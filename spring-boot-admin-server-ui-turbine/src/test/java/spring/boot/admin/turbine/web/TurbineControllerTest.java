@@ -13,13 +13,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 public class TurbineControllerTest {
 
 	private MockMvc mvc = MockMvcBuilders
-			.standaloneSetup(new TurbineController(new String[] { "c1", "c2" }))
+			.standaloneSetup(new TurbineController(new String[] { "c1", "c2" }, true))
 			.build();
 
 	@Test
 	public void test_clusters() throws Exception {
 		mvc.perform(get("/api/turbine/clusters")).andExpect(status().isOk())
-				.andExpect(jsonPath("$.clusters").value(is(asList("c1", "c2"))));
+				.andExpect(jsonPath("$.clusters").value(is(asList("c1", "c2"))))
+		        .andExpect(jsonPath("$.useStaticStreamUrl").value(true));
 	}
 
 }

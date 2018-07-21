@@ -21,11 +21,13 @@ module.exports = function ($scope, $http) {
   $scope.hystrixStream = null;
   $scope.selectedCluster = 'default';
   $scope.clusters = ['default'];
+  $scope.useStaticStreamUrl = true
 
   $http.get('api/turbine/clusters').then(function (response) {
     if (response.data.clusters.length > 0) {
       $scope.clusters = response.data.clusters;
     }
+      $scope.useStaticStreamUrl = response.data.useStaticStreamUrl;
     $scope.selectedCluster = $scope.clusters[0];
     $scope.startStream();
   });
@@ -39,7 +41,7 @@ module.exports = function ($scope, $http) {
 
   $scope.startStream = function () {
     $scope.stopStream();
-    $scope.streamUrl = 'api/turbine/stream?cluster=' + $scope.selectedCluster;
+    $scope.streamUrl = ($scope.useStaticStreamUrl ? 'turbine.stream?cluster=' : 'api/turbine/stream?cluster=') + $scope.selectedCluster;
 
     $scope.hystrixStream = new EventSource($scope.streamUrl);
     $scope.hystrixStream.addEventListener('message', function () {

@@ -15,6 +15,9 @@
  */
 package spring.boot.admin.turbine.config;
 
+import de.codecentric.boot.admin.config.AdminServerProperties;
+import de.codecentric.boot.admin.config.AdminServerWebConfiguration;
+import de.codecentric.boot.admin.config.RevereseZuulProxyConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,10 +29,6 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-
-import de.codecentric.boot.admin.config.AdminServerProperties;
-import de.codecentric.boot.admin.config.AdminServerWebConfiguration;
-import de.codecentric.boot.admin.config.RevereseZuulProxyConfiguration;
 import spring.boot.admin.turbine.web.TurbineController;
 import spring.boot.admin.turbine.zuul.filters.TurbineRouteLocator;
 
@@ -53,13 +52,21 @@ public class TurbineAutoConfiguration {
 	@Autowired
 	private ZuulProperties zuulProperties;
 
+    @Bean
+    @ConditionalOnProperty(value = "spring.boot.admin.turbine.useStaticStreamUrl", havingValue = "true", matchIfMissing = false)
+    public TurbineController staticTurbineController() {
+        return new TurbineController(properties.getClusters(), properties.isUseStaticStreamUrl());
+    }
+
 	@Bean
-	public TurbineController TurbineController() {
+    @ConditionalOnProperty(value = "spring.boot.admin.turbine.useStaticStreamUrl", havingValue = "false", matchIfMissing = true)
+	public TurbineController proxyTurbineController() {
 		return new TurbineController(properties.getClusters());
 	}
 
 	@Bean
 	@Order(100)
+    @ConditionalOnProperty(value = "spring.boot.admin.turbine.useStaticStreamUrl", havingValue = "false", matchIfMissing = true)
 	public TurbineRouteLocator staticRouteLocator(AdminServerProperties admin,
 			DiscoveryClient discovery) {
 		ZuulRoute turbineRoute = new ZuulRoute(admin.getContextPath() + "/api/turbine/stream/**",

@@ -39,6 +39,10 @@ public class TurbineProperties {
 	 */
 	private boolean enabled = true;
 
+	/**
+	 * If using static stream url which won't be proxyed by zuul. Default not.
+	 */
+	private boolean useStaticStreamUrl = false;
 
 	public String[] getClusters() {
 		return clusters;
@@ -62,6 +66,14 @@ public class TurbineProperties {
 
 	public String getLocation() {
 		return location;
+	}
+
+	public boolean isUseStaticStreamUrl() {
+		return useStaticStreamUrl;
+	}
+
+	public void setUseStaticStreamUrl(boolean useStaticStreamUrl) {
+		this.useStaticStreamUrl = useStaticStreamUrl;
 	}
 
 	@Deprecated

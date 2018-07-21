@@ -3,8 +3,6 @@ package spring.boot.admin.turbine.config;
 import de.codecentric.boot.admin.config.AdminServerCoreConfiguration;
 import de.codecentric.boot.admin.config.AdminServerWebConfiguration;
 import de.codecentric.boot.admin.config.RevereseZuulProxyConfiguration;
-import spring.boot.admin.turbine.web.TurbineController;
-
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
@@ -14,6 +12,8 @@ import org.springframework.boot.test.util.EnvironmentTestUtils;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.commons.util.UtilAutoConfiguration;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import spring.boot.admin.turbine.web.TurbineController;
+import spring.boot.admin.turbine.zuul.filters.TurbineRouteLocator;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.empty;
@@ -41,6 +41,15 @@ public class TurbineAutoConfigurationTest {
     public void test_enabled() {
         load("spring.boot.admin.turbine.url:http://turbine.server:8989/turbine.stream");
         assertThat(context.getBean(TurbineController.class), instanceOf(TurbineController.class));
+    }
+
+    @Test
+    public void test_useStaticStreamUrl() {
+        load("spring.boot.admin.turbine.enabled:true",
+                "spring.boot.admin.turbine.useStaticStreamUrl:true",
+                "spring.boot.admin.turbine.url:http://turbine.server:8989/turbine.stream");
+        assertThat(context.getBean(TurbineController.class), instanceOf(TurbineController.class));
+        assertThat(context.getBeansOfType(TurbineRouteLocator.class).values(), empty());
     }
 
     private void load(String... environment) {
